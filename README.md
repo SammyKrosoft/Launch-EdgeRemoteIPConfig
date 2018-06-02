@@ -4,7 +4,7 @@ This is a Graphical User Interface to manage Exchange 2013/2016's Remote IP rang
 
 ## Functionalities
 
-List all the Receive Connectors, list the Remote IPs for each
+List all the Receive Connectors, list the Remote IPs for each selected Receive Connectors, remove or add remote IP addresses for a selected Receive Connector.
 
 ## High Level Principles
 
