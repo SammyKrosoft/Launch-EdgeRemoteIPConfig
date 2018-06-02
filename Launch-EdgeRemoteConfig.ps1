@@ -29,8 +29,10 @@
 $ReceiveConnectorsList = Get-ReceiveConnector | Select name, RemoteIPRange,fqdn
 
 $ReceiveConnectorsGrid01 = $ReceiveConnectorsList | Select Name, fqdn
-
 $DataGrid01Source = $ReceiveConnectorsGrid01
 
-$DataGridSource = $ReceiveConnectorsList.RemoteIPRange
+
+$DataGrid02Source = $SelectedReceiveConnectorFromDataGrid01.RemoteIPRange
+If (RemoteIPRange -eq "WithLoHi") {Display it a certain way}
+If (RemoteIPRange -eq "Collection") {$DataGrid02Source = $SelectedReceiveConnectorFromDataGrid01.RemoteIPRange}
 
