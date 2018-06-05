@@ -68,6 +68,7 @@ $inputXML = @"
 </Window>
 
 "@
+
 $inputXMLClean = $inputXML -replace 'mc:Ignorable="d"','' -replace "x:N",'N' -replace 'x:Class=".*?"','' -replace 'd:DesignHeight="\d*?"','' -replace 'd:DesignWidth="\d*?"',''
 [xml]$xaml = $inputXMLClean
 $reader = New-Object System.Xml.XmlNodeReader $xaml
