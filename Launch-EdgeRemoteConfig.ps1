@@ -11,7 +11,7 @@ $global:GUIversion = "1.1"
 #========================================================
 
 function GetReceiveConnectors {
-    $ReceiveConnectorsList = Get-ReceiveConnector | Select name, RemoteIPRanges,fqdn
+    $ReceiveConnectorsList = Get-ReceiveConnector | Select name, @{Name = "Allowed IP Ranges";Expression={$_.RemoteIPRanges -Join ","}},fqdn
     $wpf.datagridReceiveConnectors.ItemsSource = $ReceiveConnectorsList 
 }
 
