@@ -11,7 +11,7 @@ $global:GUIversion = "1.1"
 #========================================================
 
 function GetReceiveConnectors {
-    $ReceiveConnectorsList = Get-ReceiveConnector | Select name, RemoteIPRange,fqdn
+    $ReceiveConnectorsList = Get-ReceiveConnector | Select name, RemoteIPRanges,fqdn
     $wpf.datagridReceiveConnectors.ItemsSource = $ReceiveConnectorsList 
 }
 
@@ -75,8 +75,7 @@ $tempform = [Windows.Markup.XamlReader]::Load($reader)
 $namedNodes = $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]")
 $namedNodes | ForEach-Object {$wpf.Add($_.Name, $tempform.FindName($_.Name))}
 
-# Load the form:
-$wpf.GrabEventLogs.ShowDialog() | Out-Null
+
 
 #========================================================
 # END of WPF form definition and load controls
@@ -118,20 +117,20 @@ $wpf.btnCancel.add_Click({
 #endregion
 
 #region Text Changed events
-$wpf.txtCSVComputersList.add_TextChanged({
+# $wpf.txtCSVComputersList.add_TextChanged({
 
-})
+# })
 
 #End of Text Changed events
 #endregion
 
 #region Checkboxes checked and unchecked
-$wpf.chkAppLog.add_Checked({
+# $wpf.chkAppLog.add_Checked({
 
-})
-$wpf.chkAppLog.add_UnChecked({
+# })
+# $wpf.chkAppLog.add_UnChecked({
 
-})
+# })
 
 # End of Checkboxes checked and unchecked
 #endregion
@@ -143,3 +142,5 @@ $wpf.chkAppLog.add_UnChecked({
 
 
 
+# Load the form:
+$wpf.EdgeIPAllow.ShowDialog() | Out-Null
