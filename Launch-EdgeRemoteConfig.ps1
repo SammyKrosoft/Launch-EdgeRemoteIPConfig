@@ -4,11 +4,19 @@ With the help of            :   Jim Moyle @jimmoyle
 How-To GUI From Jim Moyle   :   https://github.com/JimMoyle/GUIDemo
 
 #>
-$global:GUIversion = "1.1"
+$global:GUIversion = "1.0"
 
 #========================================================
 #region Functions definitions (NOT the WPF form events)
 #========================================================
+
+function ArrayToHash($a)
+{
+    $hash = @{}
+    $index = 0
+    $a | foreach { $hash.add($Index,$_);$index = $index + 1 }
+    return $hash
+}
 
 function GetReceiveConnectors {
     $ReceiveConnectorsList = Get-ReceiveConnector | Select name, @{Name = "Allowed IP Ranges";Expression={$_.RemoteIPRanges -Join ","}},fqdn
@@ -16,7 +24,13 @@ function GetReceiveConnectors {
 }
 
 function GetReceiveConnectorRemoteIPRanges {
-    $wpf.datagridReceiveConnectors.SelectedItem.Content.RemoteIPRange
+    #$wpf.dataGridIPAllowed.ItemsSource = $($wpf.datagridReceiveConnectors.SelectedItem."Allowed IP Ranges" -split ",")
+    $IPRangesCollection = $wpf.datagridReceiveConnectors.SelectedItem."Allowed IP Ranges" -split ","
+    $IPRangesCollection | Foreach {Write-Host $_}
+    Write-Host $IPRangesCollection
+    Write-Host $($IPRangesCollection.count)
+    Write-Host $($IPRangesCollection.GetType())
+    $wpf.dataGridIPAllowed.ItemsSource = ArrayToHash $IPRangesCollection
     #$DataGrid02Source = $SelectedReceiveConnectorFromDataGrid01.RemoteIPRange
     # If (RemoteIPRange -eq "WithLoHi") {Display it a certain way}
     # If (RemoteIPRange -eq "Collection") {$DataGrid02Source = $SelectedReceiveConnectorFromDataGrid01.RemoteIPRange}
@@ -55,7 +69,7 @@ $inputXML = @"
         </Grid.ColumnDefinitions>
         <Button x:Name="btnGetReceiveConnectors" Content="Get-ReceiveConnectors" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="474" Height="46" FontSize="20"/>
         <DataGrid x:Name="datagridReceiveConnectors" HorizontalAlignment="Left" Height="374" Margin="10,61,0,0" VerticalAlignment="Top" Width="474" SelectionMode="Single"/>
-        <DataGrid x:Name="dataGridIPAllowed" HorizontalAlignment="Left" Height="162" Margin="1.5,61,0,0" VerticalAlignment="Top" Width="348" Grid.Column="1"/>
+        <DataGrid x:Name="dataGridIPAllowed" HorizontalAlignment="Left" Height="162" Margin="1.5,61,0,0" VerticalAlignment="Top" Width="348" Grid.Column="1" AutoGenerateColumns="True"/>
         <Label Content="IP Allowed" HorizontalAlignment="Left" Margin="1.5,35,0,0" VerticalAlignment="Top" Height="26" Width="66" Grid.Column="1"/>
         <TextBox x:Name="txtIPAddresses" HorizontalAlignment="Left" Height="125" Margin="1.5,285,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="348" Grid.Column="1"/>
         <Button x:Name="btnRemoveIPAddresses" Content="Remove" HorizontalAlignment="Left" Margin="1.5,228,0,0" VerticalAlignment="Top" Width="74" Height="20" Grid.Column="1"/>
@@ -117,6 +131,12 @@ $wpf.btnCancel.add_Click({
 #endregion
 
 #region Text Changed events
+
+$wpf.datagridReceiveConnectors.add_SelectionChanged({
+    write-host "Selection changed"
+    GetReceiveConnectorRemoteIPRanges
+})
+
 # $wpf.txtCSVComputersList.add_TextChanged({
 
 # })
