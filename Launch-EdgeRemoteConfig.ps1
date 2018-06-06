@@ -47,23 +47,22 @@ $inputXML = @"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Add_Remove_IP_EDGE2016"
         mc:Ignorable="d"
-        Title="Add or Remove IP Allow" Height="592.766" Width="800">
+        Title="Add or Remove IP Allow" Height="592.766" Width="917.596">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="147*"/>
-            <ColumnDefinition Width="118*"/>
+            <ColumnDefinition Width="507*"/>
+            <ColumnDefinition Width="406*"/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="btnGetReceiveConnectors" Content="Get-ReceiveConnectors" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="153"/>
-        <DataGrid x:Name="datagridReceiveConnectors" HorizontalAlignment="Left" Height="374" Margin="10,35,0,0" VerticalAlignment="Top" Width="418" SelectionMode="Single"/>
-        <DataGrid x:Name="dataGridIPAllowed" HorizontalAlignment="Left" Height="139" Margin="433,61,0,0" VerticalAlignment="Top" Width="349" Grid.ColumnSpan="2"/>
-        <Label Content="IP Allowed" HorizontalAlignment="Left" Margin="433,35,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-        <TextBox x:Name="txtIPAddresses" HorizontalAlignment="Left" Height="77" Margin="433,285,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="349" Grid.ColumnSpan="2"/>
-        <Button x:Name="btnRemoveIPAddresses" Content="Remove" HorizontalAlignment="Left" Margin="433,205,0,0" VerticalAlignment="Top" Width="75" Grid.ColumnSpan="2"/>
-        <Button x:Name="btnAddIPAddresses" Content="Add" HorizontalAlignment="Left" Margin="433,367,0,0" VerticalAlignment="Top" Width="75" Grid.ColumnSpan="2"/>
-        <Button x:Name="btnRun" Content="Run" HorizontalAlignment="Left" Margin="10,434,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
-        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="275,434,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
-        <StatusBar x:Name="statusBar" HorizontalAlignment="Left" Height="29" Margin="0,537,0,-0.5" VerticalAlignment="Top" Width="795" Grid.ColumnSpan="2"/>
-
+        <Button x:Name="btnGetReceiveConnectors" Content="Get-ReceiveConnectors" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="474" Height="46" FontSize="20"/>
+        <DataGrid x:Name="datagridReceiveConnectors" HorizontalAlignment="Left" Height="374" Margin="10,61,0,0" VerticalAlignment="Top" Width="474" SelectionMode="Single"/>
+        <DataGrid x:Name="dataGridIPAllowed" HorizontalAlignment="Left" Height="162" Margin="1.5,61,0,0" VerticalAlignment="Top" Width="348" Grid.Column="1"/>
+        <Label Content="IP Allowed" HorizontalAlignment="Left" Margin="1.5,35,0,0" VerticalAlignment="Top" Height="26" Width="66" Grid.Column="1"/>
+        <TextBox x:Name="txtIPAddresses" HorizontalAlignment="Left" Height="125" Margin="1.5,285,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="348" Grid.Column="1"/>
+        <Button x:Name="btnRemoveIPAddresses" Content="Remove" HorizontalAlignment="Left" Margin="1.5,228,0,0" VerticalAlignment="Top" Width="74" Height="20" Grid.Column="1"/>
+        <Button x:Name="btnAddIPAddresses" Content="Add" HorizontalAlignment="Left" Margin="1.5,415,0,0" VerticalAlignment="Top" Width="74" Height="20" Grid.Column="1"/>
+        <Button x:Name="btnRun" Content="Run" HorizontalAlignment="Left" Margin="10,450,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="275,450,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
+        <StatusBar x:Name="statusBar" HorizontalAlignment="Left" Height="29" Margin="0,537,-0.5,-0.5" VerticalAlignment="Top" Width="913" Grid.ColumnSpan="2"/>
     </Grid>
 </Window>
 
@@ -91,7 +90,7 @@ $wpf.GrabEventLogs.ShowDialog() | Out-Null
 #region Load, Draw (render) and closing form events
 #Things to load when the WPF form is loaded aka in memory
 $wpf.EdgeIPAllow.Add_Loaded({
-    $wpf.EdgeIPAllow.Title += (" -") + ($global:GUIversion)
+    $wpf.EdgeIPAllow.Title += (" - v") + ($global:GUIversion)
 })
 #Things to load when the WPF form is rendered aka drawn on screen
 $wpf.EdgeIPAllow.Add_ContentRendered({
