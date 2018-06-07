@@ -19,22 +19,17 @@ function ArrayToHash($a)
 }
 
 function GetReceiveConnectors {
-    $ReceiveConnectorsList = Get-ReceiveConnector | Select name, @{Name = "Allowed IP Ranges";Expression={$_.RemoteIPRanges -Join ","}},fqdn
-    $wpf.datagridReceiveConnectors.ItemsSource = $ReceiveConnectorsList 
+    $Global:ReceiveConnectors = Get-ReceiveConnector
+    $ReceiveConnectorsList = $Global:ReceiveConnectors | Select name, @{Name = "Allowed IP Ranges";Expression={$_.RemoteIPRanges -Join ","}},fqdn
+    $wpf.datagridReceiveConnectors.ItemsSource = $ReceiveConnectorsList
 }
 
 function GetReceiveConnectorRemoteIPRanges {
     #$wpf.dataGridIPAllowed.ItemsSource = $($wpf.datagridReceiveConnectors.SelectedItem."Allowed IP Ranges" -split ",")
-    $IPRangesCollection = $wpf.datagridReceiveConnectors.SelectedItem."Allowed IP Ranges" -split ","
-    $IPRangesCollection | Foreach {Write-Host $_}
-    Write-Host $IPRangesCollection
-    Write-Host $($IPRangesCollection.count)
-    Write-Host $($IPRangesCollection.GetType())
-    $wpf.dataGridIPAllowed.ItemsSource = ArrayToHash $IPRangesCollection
-    #$DataGrid02Source = $SelectedReceiveConnectorFromDataGrid01.RemoteIPRange
-    # If (RemoteIPRange -eq "WithLoHi") {Display it a certain way}
-    # If (RemoteIPRange -eq "Collection") {$DataGrid02Source = $SelectedReceiveConnectorFromDataGrid01.RemoteIPRange}
-
+    [array]$IPRangesCollection = @()
+    $IPRangesCollection = $Global:ReceiveConnectors | ? {$_.Name -eq $wpf.datagridReceiveConnectors.SelectedItem.Name} | Select -ExpandProperty RemoteIPRanges | Select Expression,RangeFormat, LowerBound, UpperBound, NetMask, CIDRLength, Size
+    
+    $wpf.dataGridIPAllowed.ItemsSource = $IPRangesCollection
 
 }
 
@@ -69,7 +64,7 @@ $inputXML = @"
         </Grid.ColumnDefinitions>
         <Button x:Name="btnGetReceiveConnectors" Content="Get-ReceiveConnectors" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="474" Height="46" FontSize="20"/>
         <DataGrid x:Name="datagridReceiveConnectors" HorizontalAlignment="Left" Height="374" Margin="10,61,0,0" VerticalAlignment="Top" Width="474" SelectionMode="Single"/>
-        <DataGrid x:Name="dataGridIPAllowed" HorizontalAlignment="Left" Height="162" Margin="1.5,61,0,0" VerticalAlignment="Top" Width="348" Grid.Column="1" AutoGenerateColumns="True"/>
+        <DataGrid x:Name="dataGridIPAllowed" HorizontalAlignment="Left" Height="162" Margin="1.5,61,0,0" VerticalAlignment="Top" Width="348" Grid.Column="1" AutoGenerateColumns="True" CanUserSortColumns="True"/>
         <Label Content="IP Allowed" HorizontalAlignment="Left" Margin="1.5,35,0,0" VerticalAlignment="Top" Height="26" Width="66" Grid.Column="1"/>
         <TextBox x:Name="txtIPAddresses" HorizontalAlignment="Left" Height="125" Margin="1.5,285,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="348" Grid.Column="1"/>
         <Button x:Name="btnRemoveIPAddresses" Content="Remove" HorizontalAlignment="Left" Margin="1.5,228,0,0" VerticalAlignment="Top" Width="74" Height="20" Grid.Column="1"/>
@@ -79,7 +74,6 @@ $inputXML = @"
         <StatusBar x:Name="statusBar" HorizontalAlignment="Left" Height="29" Margin="0,537,-0.5,-0.5" VerticalAlignment="Top" Width="913" Grid.ColumnSpan="2"/>
     </Grid>
 </Window>
-
 "@
 
 $inputXMLClean = $inputXML -replace 'mc:Ignorable="d"','' -replace "x:N",'N' -replace 'x:Class=".*?"','' -replace 'd:DesignHeight="\d*?"','' -replace 'd:DesignWidth="\d*?"',''
