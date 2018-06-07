@@ -9,6 +9,22 @@ $global:GUIversion = "1.0"
 #========================================================
 #region Functions definitions (NOT the WPF form events)
 #========================================================
+Function Split-ListColon {
+    param(
+        [string]$StringToSplit,
+        [switch]$Noquotes
+    )
+    $TargetSplit = $StringToSplit.Split(',')
+    $ListItems = ""
+    If ($NoQuotes){
+        For ($i = 0; $i -lt $TargetSplit.Count - 1; $i++) {$ListItems += $TargetSplit[$i].trim() + (", ")}
+        $ListItems += $TargetSplit[$TargetSplit.Count - 1].trim()
+    } Else {
+        For ($i = 0; $i -lt $TargetSplit.Count - 1; $i++) {$ListItems += ("""") + $TargetSplit[$i].trim() + (""", ")}
+        $ListItems += ("""") + $TargetSplit[$TargetSplit.Count - 1].trim() + ("""")
+    }
+    Return $ListItems
+}
 
 function ArrayToHash($a)
 {
@@ -67,13 +83,15 @@ $inputXML = @"
         <DataGrid x:Name="dataGridIPAllowed" HorizontalAlignment="Left" Height="162" Margin="1.5,61,0,0" VerticalAlignment="Top" Width="348" Grid.Column="1" AutoGenerateColumns="True" CanUserSortColumns="True"/>
         <Label Content="IP Allowed" HorizontalAlignment="Left" Margin="1.5,35,0,0" VerticalAlignment="Top" Height="26" Width="66" Grid.Column="1"/>
         <TextBox x:Name="txtIPAddresses" HorizontalAlignment="Left" Height="125" Margin="1.5,285,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="348" Grid.Column="1"/>
-        <Button x:Name="btnRemoveIPAddresses" Content="Remove" HorizontalAlignment="Left" Margin="1.5,228,0,0" VerticalAlignment="Top" Width="74" Height="20" Grid.Column="1"/>
-        <Button x:Name="btnAddIPAddresses" Content="Add" HorizontalAlignment="Left" Margin="1.5,415,0,0" VerticalAlignment="Top" Width="74" Height="20" Grid.Column="1"/>
+        <Button x:Name="btnUpdateAllowIPAddresses" Content="Update Connector" HorizontalAlignment="Left" Margin="9.5,228,0,0" VerticalAlignment="Top" Width="125" Height="36" Grid.Column="1"/>
+        <Button x:Name="btnAddIPAddresses" Content="Add IP addresses to the above list" HorizontalAlignment="Left" Margin="1.5,415,0,0" VerticalAlignment="Top" Width="348" Height="43" Grid.Column="1"/>
         <Button x:Name="btnRun" Content="Run" HorizontalAlignment="Left" Margin="10,450,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
         <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="275,450,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
         <StatusBar x:Name="statusBar" HorizontalAlignment="Left" Height="29" Margin="0,537,-0.5,-0.5" VerticalAlignment="Top" Width="913" Grid.ColumnSpan="2"/>
+        <Button x:Name="btnRemoveAllowIPAddresses" Content="Remove" HorizontalAlignment="Left" Margin="214.5,228,0,0" VerticalAlignment="Top" Width="135" Height="36" Grid.Column="1"/>
     </Grid>
 </Window>
+
 "@
 
 $inputXMLClean = $inputXML -replace 'mc:Ignorable="d"','' -replace "x:N",'N' -replace 'x:Class=".*?"','' -replace 'd:DesignHeight="\d*?"','' -replace 'd:DesignWidth="\d*?"',''
@@ -110,6 +128,18 @@ $wpf.EdgeIPAllow.add_Closing({
 #endregion
 
 #region Buttons
+$wpf.btnAddIPAddresses.add_click({
+    $ArrayOfIPToAdd = Split-ListColon $wpf.txtIPAddresses.Text -Noquotes
+    $SelectedConnectorFullObject = $Global:ReceiveConnectors | ? {$_.Name -eq $wpf.datagridReceiveConnectors.SelectedItem.Name}
+    $SelectedConnectorRemoteIPRanges = $SelectedConnectorFullObject.RemoteIPRanges
+    $SelectedConnectorRemoteIPRanges += $ArrayOfIPToAdd
+    Set-ReceiveConnector $($wpf.datagridReceiveConnectors.SelectedItem.Name) -RemoteIPRanges $SelectedConnectorRemoteIPRanges
+    GetReceiveConnectors
+    $wpf.datagridReceiveConnectors.SelectedItem.Name = $SelectedConnectorFullObject.Name
+    GetReceiveConnectorRemoteIPRanges
+
+})
+
 $wpf.btnGetReceiveConnectors.add_Click({
     $msg = "Getting receive connectors..."
     Write-Host $msg
