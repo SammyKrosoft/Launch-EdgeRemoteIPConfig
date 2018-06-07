@@ -1,6 +1,10 @@
 # Launch-EdgeRemoteIPConfig
 
-This is a Graphical User Interface to manage Exchange 2013/2016's Remote IP ranges. The purpose is to generate the corresponding PowerShell comamand, and optionally the admin can copy/paste it to another Exchange Management Shell or for documentation purposes, or just run that generated command.
+This is a Graphical User Interface to manage Exchange 2013/2016's Remote IP ranges. The purpose is to give you a graphical view of the list of IP addresses that are allowed on a selected Receive Connector.
+
+At this stage (v.0.5), you can only graphically view the list of IP addresses that are currently Allowed on each Receive Connector, and you can activate an "extended view" to view the properties of each IP address entry (whether it's a Single IP Address, or a CIDR expression - as in 10.0.0.0/24, or an IP range as in 0.0.0.0-255.255.255.255 like in the default receive connectors...)
+
+You can also select all the IP addresses, and copy these somewhere for documentation purposes for example...
 
 ## Functionalities
 
