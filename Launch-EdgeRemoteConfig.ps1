@@ -76,7 +76,7 @@ $inputXML = @"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Add_Remove_IP_EDGE2016"
         mc:Ignorable="d"
-        Title="Add or Remove IP Allow" Height="592.766" Width="917.596">
+        Title="Add or Remove IP Allow" Height="592.766" Width="917.596" ResizeMode="NoResize">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="507*"/>

@@ -6,6 +6,10 @@ At this stage (v.0.5), you can only graphically view the list of IP addresses th
 
 You can also select all the IP addresses, and copy these somewhere for documentation purposes for example...
 
+# Current appearance (as of v0.5b)
+
+![Fig1](/Screenshots/EdgeRemoteIPConfig-Fig1.png)
+
 ## Functionalities
 
 List all the Receive Connectors, list the Remote IPs for each selected Receive Connectors, remove or add remote IP addresses for a selected Receive Connector.
