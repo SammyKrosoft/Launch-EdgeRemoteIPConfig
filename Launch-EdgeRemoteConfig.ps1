@@ -4,7 +4,7 @@ With the help of            :   Jim Moyle @jimmoyle
 How-To GUI From Jim Moyle   :   https://github.com/JimMoyle/GUIDemo
 
 #>
-$global:GUIversion = "1.0"
+$global:GUIversion = "0.5"
 
 #========================================================
 #region Functions definitions (NOT the WPF form events)
@@ -37,14 +37,18 @@ function ArrayToHash($a)
 function GetReceiveConnectors {
     $Global:ReceiveConnectors = Get-ReceiveConnector
     $ReceiveConnectorsList = $Global:ReceiveConnectors | Select name, @{Name = "Allowed IP Ranges";Expression={$_.RemoteIPRanges -Join ","}},fqdn
+
     $wpf.datagridReceiveConnectors.ItemsSource = $ReceiveConnectorsList
 }
 
-function GetReceiveConnectorRemoteIPRanges {
+function GetReceiveConnectorRemoteIPRanges ([switch]$Simple) {
     #$wpf.dataGridIPAllowed.ItemsSource = $($wpf.datagridReceiveConnectors.SelectedItem."Allowed IP Ranges" -split ",")
     [array]$IPRangesCollection = @()
-    $IPRangesCollection = $Global:ReceiveConnectors | ? {$_.Name -eq $wpf.datagridReceiveConnectors.SelectedItem.Name} | Select -ExpandProperty RemoteIPRanges | Select Expression,RangeFormat, LowerBound, UpperBound, NetMask, CIDRLength, Size
-    
+    If ($Simple) {
+        $IPRangesCollection = $Global:ReceiveConnectors | ? {$_.Name -eq $wpf.datagridReceiveConnectors.SelectedItem.Name} | Select -ExpandProperty RemoteIPRanges | Select Expression
+    } Else {
+        $IPRangesCollection = $Global:ReceiveConnectors | ? {$_.Name -eq $wpf.datagridReceiveConnectors.SelectedItem.Name} | Select -ExpandProperty RemoteIPRanges | Select Expression,RangeFormat, LowerBound, UpperBound, NetMask, CIDRLength, Size
+    }
     $wpf.dataGridIPAllowed.ItemsSource = $IPRangesCollection
 
 }
@@ -82,13 +86,14 @@ $inputXML = @"
         <DataGrid x:Name="datagridReceiveConnectors" HorizontalAlignment="Left" Height="374" Margin="10,61,0,0" VerticalAlignment="Top" Width="474" SelectionMode="Single"/>
         <DataGrid x:Name="dataGridIPAllowed" HorizontalAlignment="Left" Height="162" Margin="1.5,61,0,0" VerticalAlignment="Top" Width="348" Grid.Column="1" AutoGenerateColumns="True" CanUserSortColumns="True"/>
         <Label Content="IP Allowed" HorizontalAlignment="Left" Margin="1.5,35,0,0" VerticalAlignment="Top" Height="26" Width="66" Grid.Column="1"/>
-        <TextBox x:Name="txtIPAddresses" HorizontalAlignment="Left" Height="125" Margin="1.5,285,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="348" Grid.Column="1"/>
-        <Button x:Name="btnUpdateAllowIPAddresses" Content="Update Connector" HorizontalAlignment="Left" Margin="9.5,228,0,0" VerticalAlignment="Top" Width="125" Height="36" Grid.Column="1"/>
-        <Button x:Name="btnAddIPAddresses" Content="Add IP addresses to the above list" HorizontalAlignment="Left" Margin="1.5,415,0,0" VerticalAlignment="Top" Width="348" Height="43" Grid.Column="1"/>
+        <TextBox x:Name="txtIPAddresses" HorizontalAlignment="Left" Height="125" Margin="1.5,285,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="348" Grid.Column="1" IsEnabled="False"/>
+        <Button x:Name="btnUpdateAllowIPAddresses" Content="Update Connector" HorizontalAlignment="Left" Margin="9.5,228,0,0" VerticalAlignment="Top" Width="125" Height="36" Grid.Column="1" IsEnabled="False"/>
+        <Button x:Name="btnAddIPAddresses" Content="Add IP addresses to the above list" HorizontalAlignment="Left" Margin="1.5,415,0,0" VerticalAlignment="Top" Width="348" Height="43" Grid.Column="1" IsEnabled="False"/>
         <Button x:Name="btnRun" Content="Run" HorizontalAlignment="Left" Margin="10,450,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
         <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="275,450,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
         <StatusBar x:Name="statusBar" HorizontalAlignment="Left" Height="29" Margin="0,537,-0.5,-0.5" VerticalAlignment="Top" Width="913" Grid.ColumnSpan="2"/>
-        <Button x:Name="btnRemoveAllowIPAddresses" Content="Remove" HorizontalAlignment="Left" Margin="214.5,228,0,0" VerticalAlignment="Top" Width="135" Height="36" Grid.Column="1"/>
+        <Button x:Name="btnRemoveAllowIPAddresses" Content="Remove" HorizontalAlignment="Left" Margin="214.5,228,0,0" VerticalAlignment="Top" Width="135" Height="36" Grid.Column="1" IsEnabled="False"/>
+        <CheckBox x:Name="chkExtendedIPView" Content="Extended IP Info View" Grid.Column="1" HorizontalAlignment="Left" Margin="189,41,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>
 
@@ -158,7 +163,11 @@ $wpf.btnCancel.add_Click({
 
 $wpf.datagridReceiveConnectors.add_SelectionChanged({
     write-host "Selection changed"
-    GetReceiveConnectorRemoteIPRanges
+    If ($wpf.chkExtendedIPView.Checked -eq $true) {
+        GetReceiveConnectorRemoteIPRanges
+    } Else {
+        GetReceiveConnectorRemoteIPRanges -Simple
+    }
 })
 
 # $wpf.txtCSVComputersList.add_TextChanged({
@@ -169,12 +178,12 @@ $wpf.datagridReceiveConnectors.add_SelectionChanged({
 #endregion
 
 #region Checkboxes checked and unchecked
-# $wpf.chkAppLog.add_Checked({
-
-# })
-# $wpf.chkAppLog.add_UnChecked({
-
-# })
+$wpf.chkExtendedIPView.add_Checked({
+    GetReceiveConnectorRemoteIPRanges
+})
+$wpf.chkExtendedIPView.add_UnChecked({
+    GetReceiveConnectorRemoteIPRanges -Simple
+})
 
 # End of Checkboxes checked and unchecked
 #endregion
@@ -187,4 +196,9 @@ $wpf.datagridReceiveConnectors.add_SelectionChanged({
 
 
 # Load the form:
-$wpf.EdgeIPAllow.ShowDialog() | Out-Null
+# Older way >>>>> $wpf.EdgeIPAllow.ShowDialog() | Out-Null >>>> generates crash if run multiple times
+# USing method from https://gist.github.com/altrive/6227237 to avoid crashing Powershell after we re-run the script after some inactivity time or if we run it several times consecutively...
+$async = $wpf.EdgeIPAllow.Dispatcher.InvokeAsync({
+    $wpf.EdgeIPAllow.ShowDialog() | Out-Null
+})
+$async.Wait() | Out-Null
