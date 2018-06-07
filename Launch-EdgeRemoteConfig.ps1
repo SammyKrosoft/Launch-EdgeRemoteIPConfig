@@ -163,7 +163,7 @@ $wpf.btnCancel.add_Click({
 
 $wpf.datagridReceiveConnectors.add_SelectionChanged({
     #write-host "Selection changed"
-    If ($wpf.chkExtendedIPView.Checked -eq $true) {
+    If ($wpf.chkExtendedIPView.IsChecked -eq $true) {
         GetReceiveConnectorRemoteIPRanges
     } Else {
         GetReceiveConnectorRemoteIPRanges -Simple
