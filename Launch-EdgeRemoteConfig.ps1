@@ -66,6 +66,34 @@ function Dump-ToHost {
 
 }
 
+Function Remove-IPs {
+    $AllIPS = $wpf.dataGridIPAllowed.ItemsSource
+    $SelectedIPs = $wpf.dataGridIPAllowed.SelectedItems
+    Write-Host $SelectedIPs
+    $NbItemsSelected = $($SelectedIPs.count)
+    Write-Host $AllIPs
+    Write-Host $($AllIPS.count)
+    #[System.Windows.messagebox]::Show("Where are $($SelectedIPs.count) IP addresses","IP addresses")
+    Foreach ($IP in $SelectedIPs) {
+        $ALLIPs = $ALLIPs | ? {$_.Expression -ne $($IP.Expression)}
+    }
+    $wpf.dataGridIPAllowed.ItemsSource = $AllIPS
+    Write-Host "After removal of $NbItemsSelected IPs, we now have $($AllIPS.count) items"
+    Write-Host $AllIPS
+
+    Write-Host "Will set connector:"
+    $ConnectorSelected = $wpf.datagridReceiveConnectors.SelectedItem.Name
+    $ConnectorSelected = ("""") + $ConnectorSelected + ("""")
+    $ConnectorSelected | out-host
+    
+    $NewIPs = ("""") + $($AllIPs.Expression -join """,""") + ("""")
+
+    $command = "Get-ReceiveConnector $ConnectorSelected | Set-ReceiveConnector -RemoteIPRanges $NewIPs"
+    $command | out-host
+}
+
+
+
 Function Split-ListColon {
     param(
         [string]$StringToSplit,
@@ -148,7 +176,7 @@ $inputXML = @"
         <Button x:Name="btnRun" Content="Run" HorizontalAlignment="Left" Margin="10,450,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
         <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="275,450,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
         <StatusBar x:Name="statusBar" HorizontalAlignment="Left" Height="29" Margin="0,537,-0.5,-0.5" VerticalAlignment="Top" Width="913" Grid.ColumnSpan="2"/>
-        <Button x:Name="btnRemoveAllowIPAddresses" Content="Remove selected IP Address(es)" HorizontalAlignment="Left" Margin="0,228,0,0" VerticalAlignment="Top" Width="193" Height="36" Grid.Column="1" IsEnabled="False"/>
+        <Button x:Name="btnRemoveAllowIPAddresses" Content="Remove selected IP Address(es)" HorizontalAlignment="Left" Margin="0,228,0,0" VerticalAlignment="Top" Width="193" Height="36" Grid.Column="1"/>
         <CheckBox x:Name="chkExtendedIPView" Content="Extended IP Info View" Grid.Column="1" HorizontalAlignment="Left" Margin="189,41,0,0" VerticalAlignment="Top"/>
         <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="0,288,0,0" TextWrapping="Wrap" Text="Addresses to add (Comma separated - e.g. 125.3.10.15, 10.1.0.0/16, 212.12.0.0-212.12.255.255, 15.2.3.2):" VerticalAlignment="Top"/>
         <Button x:Name="btnDumpIPs" Content="Dump Selected IPs to host" Grid.Column="1" HorizontalAlignment="Left" Margin="198,228,0,0" VerticalAlignment="Top" Width="152" Height="36"/>
@@ -192,9 +220,13 @@ $wpf.EdgeIPAllow.add_Closing({
 
 #region Buttons
 
-$wpf.btnDumpIPs.add_Click{
+$wpf.btnRemoveAllowIPAddresses.add_click({
+    Remove-IPs
+})
+
+$wpf.btnDumpIPs.add_Click({
     Dump-ToHost
-}
+})
 
 $wpf.btnAddIPAddresses.add_click({
     $ArrayOfIPToAdd = Split-ListColon $wpf.txtIPAddresses.Text -Noquotes
