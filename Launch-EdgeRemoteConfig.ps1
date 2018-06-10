@@ -86,14 +86,14 @@ $inputXML = @"
         <DataGrid x:Name="datagridReceiveConnectors" HorizontalAlignment="Left" Height="374" Margin="10,61,0,0" VerticalAlignment="Top" Width="474" SelectionMode="Single"/>
         <DataGrid x:Name="dataGridIPAllowed" HorizontalAlignment="Left" Height="162" Margin="1.5,61,0,0" VerticalAlignment="Top" Width="348" Grid.Column="1" AutoGenerateColumns="True" CanUserSortColumns="True"/>
         <Label Content="IP Allowed" HorizontalAlignment="Left" Margin="1.5,35,0,0" VerticalAlignment="Top" Height="26" Width="66" Grid.Column="1"/>
-        <TextBox x:Name="txtIPAddresses" HorizontalAlignment="Left" Height="125" Margin="1.5,285,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="348" Grid.Column="1" IsEnabled="False"/>
-        <Button x:Name="btnUpdateAllowIPAddresses" Content="Update Connector" HorizontalAlignment="Left" Margin="9.5,228,0,0" VerticalAlignment="Top" Width="125" Height="36" Grid.Column="1" IsEnabled="False"/>
-        <Button x:Name="btnAddIPAddresses" Content="Add IP addresses to the above list" HorizontalAlignment="Left" Margin="1.5,415,0,0" VerticalAlignment="Top" Width="348" Height="43" Grid.Column="1" IsEnabled="False"/>
+        <TextBox x:Name="txtIPAddresses" HorizontalAlignment="Left" Height="110" Margin="0,325,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="348" Grid.Column="1" IsEnabled="False"/>
+        <Button x:Name="btnAddIPAddresses" Content="Add IP addresses" HorizontalAlignment="Left" Margin="2,440,0,0" VerticalAlignment="Top" Width="134" Height="30" Grid.Column="1" IsEnabled="False"/>
         <Button x:Name="btnRun" Content="Run" HorizontalAlignment="Left" Margin="10,450,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
         <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="275,450,0,0" VerticalAlignment="Top" Width="153" Height="41"/>
         <StatusBar x:Name="statusBar" HorizontalAlignment="Left" Height="29" Margin="0,537,-0.5,-0.5" VerticalAlignment="Top" Width="913" Grid.ColumnSpan="2"/>
-        <Button x:Name="btnRemoveAllowIPAddresses" Content="Remove" HorizontalAlignment="Left" Margin="214.5,228,0,0" VerticalAlignment="Top" Width="135" Height="36" Grid.Column="1" IsEnabled="False"/>
+        <Button x:Name="btnRemoveAllowIPAddresses" Content="Remove selected IP Address(es)" HorizontalAlignment="Left" Margin="0,228,0,0" VerticalAlignment="Top" Width="193" Height="36" Grid.Column="1" IsEnabled="False"/>
         <CheckBox x:Name="chkExtendedIPView" Content="Extended IP Info View" Grid.Column="1" HorizontalAlignment="Left" Margin="189,41,0,0" VerticalAlignment="Top"/>
+        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="0,288,0,0" TextWrapping="Wrap" Text="Addresses to add (Comma separated - e.g. 125.3.10.15, 10.1.0.0/16, 212.12.0.0-212.12.255.255, 15.2.3.2):" VerticalAlignment="Top"/>
     </Grid>
 </Window>
 
