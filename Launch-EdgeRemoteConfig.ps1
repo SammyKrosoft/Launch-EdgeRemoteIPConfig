@@ -9,6 +9,14 @@ $global:GUIversion = "0.5"
 #========================================================
 #region Functions definitions (NOT the WPF form events)
 #========================================================
+
+function Dump-ToHost {
+    $SelectedIPs = $wpf.dataGridIPAllowed.SelectedItems.Expression
+    Write-Host $SelectedIPs
+    Write-host $($SelectedIPs.count)
+    [System.Windows.messagebox]::Show("Where are $($SelectedIPs.count) IP addresses","IP addresses")
+}
+
 Function Split-ListColon {
     param(
         [string]$StringToSplit,
@@ -94,6 +102,7 @@ $inputXML = @"
         <Button x:Name="btnRemoveAllowIPAddresses" Content="Remove selected IP Address(es)" HorizontalAlignment="Left" Margin="0,228,0,0" VerticalAlignment="Top" Width="193" Height="36" Grid.Column="1" IsEnabled="False"/>
         <CheckBox x:Name="chkExtendedIPView" Content="Extended IP Info View" Grid.Column="1" HorizontalAlignment="Left" Margin="189,41,0,0" VerticalAlignment="Top"/>
         <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="0,288,0,0" TextWrapping="Wrap" Text="Addresses to add (Comma separated - e.g. 125.3.10.15, 10.1.0.0/16, 212.12.0.0-212.12.255.255, 15.2.3.2):" VerticalAlignment="Top"/>
+        <Button x:Name="btnDumpIPs" Content="Dump Selected IPs to host" Grid.Column="1" HorizontalAlignment="Left" Margin="198,228,0,0" VerticalAlignment="Top" Width="152" Height="36"/>
     </Grid>
 </Window>
 
@@ -133,6 +142,11 @@ $wpf.EdgeIPAllow.add_Closing({
 #endregion
 
 #region Buttons
+
+$wpf.btnDumpIPs.add_Click{
+    Dump-ToHost
+}
+
 $wpf.btnAddIPAddresses.add_click({
     $ArrayOfIPToAdd = Split-ListColon $wpf.txtIPAddresses.Text -Noquotes
     $SelectedConnectorFullObject = $Global:ReceiveConnectors | ? {$_.Name -eq $wpf.datagridReceiveConnectors.SelectedItem.Name}
