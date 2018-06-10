@@ -10,11 +10,60 @@ $global:GUIversion = "0.5"
 #region Functions definitions (NOT the WPF form events)
 #========================================================
 
+Function Test-ExchTools(){
+    <#
+    .SYNOPSIS
+    This small function will just check if you have Exchange tools installed or available on the
+    current PowerShell session.
+    
+    .DESCRIPTION
+    The presence of Exchange tools are checked by trying to execute "Get-ExBanner", one of the basic Exchange
+    cmdlets that runs when the Exchange Management Shell is called.
+    
+    Just use Test-ExchTools in your script to make the script exit if not launched from an Exchange
+    tools PowerShell session...
+    
+    .EXAMPLE
+    Test-ExchTools
+    => will exit the script/program si Exchange tools are not installed
+    #>
+        Try
+        {
+            Get-command Get-ExBanner -ErrorAction Stop
+            $ExchInstalledStatus = $true
+            $Message = "Exchange tools are present !"
+            Write-Host $Message -ForegroundColor Blue -BackgroundColor Red
+        }
+        Catch [System.SystemException]
+        {
+            $ExchInstalledStatus = $false
+            $Message = "Exchange Tools are not present ! This script/tool need these. Exiting..."
+            Write-Host $Message -ForegroundColor red -BackgroundColor Blue
+            Exit
+        }
+        Return $ExchInstalledStatus
+    }
+        
+
 function Dump-ToHost {
-    $SelectedIPs = $wpf.dataGridIPAllowed.SelectedItems.Expression
+    $AllIPS = $wpf.dataGridIPAllowed.ItemsSource
+    $AllIPs | Get-Member
+    $SelectedIPs = $wpf.dataGridIPAllowed.SelectedItems
     Write-Host $SelectedIPs
-    Write-host $($SelectedIPs.count)
-    [System.Windows.messagebox]::Show("Where are $($SelectedIPs.count) IP addresses","IP addresses")
+    $NbItemsSelected = $($SelectedIPs.count)
+    Write-Host $AllIPs
+    Write-Host $($AllIPS.count)
+    #[System.Windows.messagebox]::Show("Where are $($SelectedIPs.count) IP addresses","IP addresses")
+    Foreach ($IP in $SelectedIPs) {
+        $ALLIPs = $ALLIPs | ? {$_.Expression -ne $($IP.Expression)}
+    }
+    $wpf.dataGridIPAllowed.ItemsSource = $AllIPS
+    Write-Host "After removal of $NbItemsSelected IPs, we now have $($AllIPS.count) items"
+    Write-Host $AllIPS
+
+    Write-Host "Will set connector:"
+    $wpf.datagridReceiveConnectors.SelectedItem.Name | out-host
+
 }
 
 Function Split-ListColon {
@@ -207,7 +256,7 @@ $wpf.chkExtendedIPView.add_UnChecked({
 #endregion
 #=======================================================
 
-
+Test-ExchTools
 
 # Load the form:
 # Older way >>>>> $wpf.EdgeIPAllow.ShowDialog() | Out-Null >>>> generates crash if run multiple times
