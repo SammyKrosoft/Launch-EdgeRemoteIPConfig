@@ -89,6 +89,7 @@ function Dump-ToHost {
 }
 
 Function Remove-IPs {
+    $AllIPs = @{}
     $AllIPS = $wpf.dataGridIPAllowed.ItemsSource
     $SelectedIPs = $wpf.dataGridIPAllowed.SelectedItems
     Write-Host $SelectedIPs
@@ -99,7 +100,12 @@ Function Remove-IPs {
     Foreach ($IP in $SelectedIPs) {
         $ALLIPs = $ALLIPs | ? {$_.Expression -ne $($IP.Expression)}
     }
-    $wpf.dataGridIPAllowed.ItemsSource = $AllIPS
+    If ($ALLIPS.Count -le 1){
+        $wpf.dataGridIPAllowed.ItemsSource = [array]$AllIPS
+    } Else {
+        $wpf.dataGridIPAllowed.ItemsSource = $AllIPS
+    }
+    
     Write-Host "After removal of $NbItemsSelected IPs, we now have $($AllIPS.count) items"
     Write-Host $AllIPS
 
@@ -112,6 +118,7 @@ Function Remove-IPs {
 
     $command = "Get-ReceiveConnector $ConnectorSelected | Set-ReceiveConnector -RemoteIPRanges $NewIPs"
     $command | out-host
+    Invoke-Expression $command
 }
 
 
@@ -311,7 +318,7 @@ $wpf.chkExtendedIPView.add_UnChecked({
 #=======================================================
 
 #Testing if at least PowerShell V3 is present
-IsPSV3
+IsPSV3 | out-null
 #Testing if Exchange Tools are loaded
 Test-ExchTools
 
