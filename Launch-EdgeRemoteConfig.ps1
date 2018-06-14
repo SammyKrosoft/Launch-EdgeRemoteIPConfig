@@ -10,6 +10,10 @@ $global:GUIversion = "0.5"
 #region Functions definitions (NOT the WPF form events)
 #========================================================
 
+Function MessageBox ($Title = "Validation",$msg="Message not provided...",$Button = "YesNo",$Icon = "Question") {
+    return [System.Windows.MessageBox]::Show($msg,$Title, $Button, $icon)
+}
+
 Function IsPSV3 {
     <#
     .DESCRIPTION
@@ -100,10 +104,23 @@ Function Remove-IPs {
     Foreach ($IP in $SelectedIPs) {
         $ALLIPs = $ALLIPs | ? {$_.Expression -ne $($IP.Expression)}
     }
-    If ($ALLIPS.Count -le 1){
+
+        "Count of IPs : $($ALLIPs.count)" | out-host
+
+    If (($ALLIPS.Count -eq 1) -or ($ALLIPs.Count -eq "") -or ($ALLIPs.Count -eq $Null)){
         $wpf.dataGridIPAllowed.ItemsSource = [array]$AllIPS
+        $NewIPs = ("""") + $($AllIPs.Expression -join """,""") + ("""")
+    } ElseIf ($ALLIPS.Count -eq 0) {
+        $msg = "This will reset the Allowed IP to 0.0.0.0-255.255.255.255 if possible,`ndo you want to continue ?"
+        $Decision = MessageBox -msg $msg
+        If ($Decision -eq "Yes") {
+            $NewIPs = "0.0.0.0-255.255.255.255"
+        } Else {
+            #Do nothing and leave $NewIPS alone...
+        }
     } Else {
         $wpf.dataGridIPAllowed.ItemsSource = $AllIPS
+        $NewIPs = ("""") + $($AllIPs.Expression -join """,""") + ("""")
     }
     
     Write-Host "After removal of $NbItemsSelected IPs, we now have $($AllIPS.count) items"
@@ -114,11 +131,19 @@ Function Remove-IPs {
     $ConnectorSelected = ("""") + $ConnectorSelected + ("""")
     $ConnectorSelected | out-host
     
-    $NewIPs = ("""") + $($AllIPs.Expression -join """,""") + ("""")
+    
 
     $command = "Get-ReceiveConnector $ConnectorSelected | Set-ReceiveConnector -RemoteIPRanges $NewIPs"
     $command | out-host
-    Invoke-Expression $command
+    Try{
+        $CommandToInvoke = $Command + (" -ErrorAction Stop")
+        Invoke-Expression $commandToInvoke
+    } Catch {
+        $CommandGenerateError = $Command + (" -ErrorAction SilentlyContinue")
+        Invoke-Expression $commandGenerateError
+        $msg = "Something went wrong when setting the Receive connector addresses.`nHere's the error message we got:`n`n$($Error[0])"
+        MEssageBox -msg $msg -title "Error in your attempt to remove IP address" -Icon "Stop" -Button "Ok"
+    }
 }
 
 
