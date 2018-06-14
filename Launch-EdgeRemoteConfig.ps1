@@ -102,12 +102,12 @@ Function Remove-IPs {
     Write-Host $($AllIPS.count)
     #[System.Windows.messagebox]::Show("Where are $($SelectedIPs.count) IP addresses","IP addresses")
     Foreach ($IP in $SelectedIPs) {
-        $ALLIPs = $ALLIPs | ? {$_.Expression -ne $($IP.Expression)}
+        [array]$ALLIPs = $ALLIPs | ? {$_.Expression -ne $($IP.Expression)}
     }
 
         "Count of IPs : $($ALLIPs.count)" | out-host
 
-    If (($ALLIPS.Count -eq 1) -or ($ALLIPs.Count -eq "") -or ($ALLIPs.Count -eq $Null)){
+    If ($ALLIPS.Count -eq 1){
         $wpf.dataGridIPAllowed.ItemsSource = [array]$AllIPS
         $NewIPs = ("""") + $($AllIPs.Expression -join """,""") + ("""")
     } ElseIf ($ALLIPS.Count -eq 0) {
