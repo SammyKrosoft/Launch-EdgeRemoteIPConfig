@@ -4,12 +4,18 @@ With the help of            :   Jim Moyle @jimmoyle
 How-To GUI From Jim Moyle   :   https://github.com/JimMoyle/GUIDemo
 
 #>
-$global:GUIversion = "0.5"
+$global:GUIversion = "0.9"
 
 #========================================================
 #region Functions definitions (NOT the WPF form events)
 #========================================================
+Function MessageBox ($msg="Message not provided...") {
+    $Title = "Validation"
+    $Button = "YesNo"
+    $Icon = "Question"
+    return [System.Windows.MessageBox]::Show($msg,$Title, $Button, $icon)
 
+}
 Function IsPSV3 {
     <#
     .DESCRIPTION
