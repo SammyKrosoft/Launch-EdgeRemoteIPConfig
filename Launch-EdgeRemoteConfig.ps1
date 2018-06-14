@@ -105,7 +105,7 @@ Function Remove-IPs {
         [array]$ALLIPs = $ALLIPs | ? {$_.Expression -ne $($IP.Expression)}
     }
 
-        "Count of IPs : $($ALLIPs.count)" | out-host
+    "Count of IPs : $($ALLIPs.count)" | out-host
 
     If ($ALLIPS.Count -eq 1){
         $wpf.dataGridIPAllowed.ItemsSource = [array]$AllIPS
@@ -165,8 +165,7 @@ Function Split-ListColon {
     Return $ListItems
 }
 
-function ArrayToHash($a)
-{
+function ArrayToHash($a){
     $hash = @{}
     $index = 0
     $a | foreach { $hash.add($Index,$_);$index = $index + 1 }
@@ -291,7 +290,6 @@ $wpf.btnAddIPAddresses.add_click({
     GetReceiveConnectors
     $wpf.datagridReceiveConnectors.SelectedItem.Name = $SelectedConnectorFullObject.Name
     GetReceiveConnectorRemoteIPRanges
-
 })
 
 $wpf.btnGetReceiveConnectors.add_Click({
@@ -345,7 +343,7 @@ $wpf.chkExtendedIPView.add_UnChecked({
 #Testing if at least PowerShell V3 is present
 IsPSV3 | out-null
 #Testing if Exchange Tools are loaded
-Test-ExchTools
+Test-ExchTools | out-null
 
 # Load the form:
 # Older way >>>>> $wpf.EdgeIPAllow.ShowDialog() | Out-Null >>>> generates crash if run multiple times
