@@ -9,13 +9,11 @@ $global:GUIversion = "0.9"
 #========================================================
 #region Functions definitions (NOT the WPF form events)
 #========================================================
-Function MessageBox ($msg="Message not provided...") {
-    $Title = "Validation"
-    $Button = "YesNo"
-    $Icon = "Question"
-    return [System.Windows.MessageBox]::Show($msg,$Title, $Button, $icon)
 
+Function MessageBox ($Title = "Validation",$msg="Message not provided...",$Button = "YesNo",$Icon = "Question") {
+    return [System.Windows.MessageBox]::Show($msg,$Title, $Button, $icon)
 }
+
 Function IsPSV3 {
     <#
     .DESCRIPTION
@@ -71,7 +69,6 @@ Function Test-ExchTools(){
         }
         Return $ExchInstalledStatus
     }
-        
 
 function Dump-ToHost {
     $AllIPS = $wpf.dataGridIPAllowed.ItemsSource
@@ -104,12 +101,31 @@ Function Remove-IPs {
     Write-Host $($AllIPS.count)
     #[System.Windows.messagebox]::Show("Where are $($SelectedIPs.count) IP addresses","IP addresses")
     Foreach ($IP in $SelectedIPs) {
-        $ALLIPs = $ALLIPs | ? {$_.Expression -ne $($IP.Expression)}
+        [array]$ALLIPs = $ALLIPs | ? {$_.Expression -ne $($IP.Expression)}
     }
-    If ($ALLIPS.Count -le 1){
+
+    "Count of IPs : $($ALLIPs.count)" | out-host
+
+    If ($ALLIPS.Count -eq 1){
         $wpf.dataGridIPAllowed.ItemsSource = [array]$AllIPS
+        $NewIPs = ("""") + $($AllIPs.Expression -join """,""") + ("""")
+    } ElseIf ($ALLIPS.Count -eq 0) {
+        $msg = "This will reset the Allowed IP to 0.0.0.0-255.255.255.255 if possible,`ndo you want to continue ?"
+        $Decision = MessageBox -msg $msg
+        "Décision = $Decision" | out-host
+        If ($Decision -eq "Yes") {
+            "Decision YES" | out-host
+            $ALLIPS = @{Expression="0.0.0.0-255.255.255.255"; RangeFormat=""; LowerBound=""; UpperBound=""; Netmask=""; CIDRLength=""; Size=""}
+            $ALLIPS = @{Expression="0.0.0.0-255.255.255.255"; RangeFormat=""}
+            $wpf.dataGridIPAllowed.ItemsSource = $AllIPS
+        } Else {
+            "Decision = NO" | Out-Host
+            #Do nothing and leave $NewIPS alone...
+        }
     } Else {
+        "More than 1 IPs..." | Out-Host
         $wpf.dataGridIPAllowed.ItemsSource = $AllIPS
+        $NewIPs = ("""") + $($AllIPs.Expression -join """,""") + ("""")
     }
     
     Write-Host "After removal of $NbItemsSelected IPs, we now have $($AllIPS.count) items"
@@ -119,15 +135,19 @@ Function Remove-IPs {
     $ConnectorSelected = $wpf.datagridReceiveConnectors.SelectedItem.Name
     $ConnectorSelected = ("""") + $ConnectorSelected + ("""")
     $ConnectorSelected | out-host
-    
-    $NewIPs = ("""") + $($AllIPs.Expression -join """,""") + ("""")
 
     $command = "Get-ReceiveConnector $ConnectorSelected | Set-ReceiveConnector -RemoteIPRanges $NewIPs"
     $command | out-host
-    Invoke-Expression $command
+    Try{
+        $CommandToInvoke = $Command + (" -ErrorAction Stop")
+        #Invoke-Expression $commandToInvoke
+    } Catch {
+        $CommandGenerateError = $Command + (" -ErrorAction SilentlyContinue")
+        #Invoke-Expression $commandGenerateError
+        $msg = "Something went wrong when setting the Receive connector addresses.`nHere's the error message we got:`n`n$($Error[0])"
+        MessageBox -msg $msg -title "Error in your attempt to remove IP address" -Icon "Stop" -Button "Ok"
+    }
 }
-
-
 
 Function Split-ListColon {
     param(
@@ -146,8 +166,7 @@ Function Split-ListColon {
     Return $ListItems
 }
 
-function ArrayToHash($a)
-{
+function ArrayToHash($a){
     $hash = @{}
     $index = 0
     $a | foreach { $hash.add($Index,$_);$index = $index + 1 }
@@ -272,7 +291,6 @@ $wpf.btnAddIPAddresses.add_click({
     GetReceiveConnectors
     $wpf.datagridReceiveConnectors.SelectedItem.Name = $SelectedConnectorFullObject.Name
     GetReceiveConnectorRemoteIPRanges
-
 })
 
 $wpf.btnGetReceiveConnectors.add_Click({
@@ -326,7 +344,7 @@ $wpf.chkExtendedIPView.add_UnChecked({
 #Testing if at least PowerShell V3 is present
 IsPSV3 | out-null
 #Testing if Exchange Tools are loaded
-Test-ExchTools
+Test-ExchTools | out-null
 
 # Load the form:
 # Older way >>>>> $wpf.EdgeIPAllow.ShowDialog() | Out-Null >>>> generates crash if run multiple times
