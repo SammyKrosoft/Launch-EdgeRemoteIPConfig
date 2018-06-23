@@ -115,9 +115,10 @@ Function Remove-IPs {
         "Décision = $Decision" | out-host
         If ($Decision -eq "Yes") {
             "Decision YES" | out-host
-            $ALLIPS = @{Expression="0.0.0.0-255.255.255.255"; RangeFormat=""; LowerBound=""; UpperBound=""; Netmask=""; CIDRLength=""; Size=""}
-            $ALLIPS = @{Expression="0.0.0.0-255.255.255.255"; RangeFormat=""}
-            $wpf.dataGridIPAllowed.ItemsSource = $AllIPS
+            #$ALLIPS = @{Expression="0.0.0.0-255.255.255.255"; RangeFormat=""; LowerBound=""; UpperBound=""; Netmask=""; CIDRLength=""; Size=""}
+            $Array  = @{"IP Address"="0.0.0.0-255.255.255.255"}
+            $ALLIPss = $Array
+            $wpf.dataGridIPAllowed.ItemsSource = $ALLIPss
         } Else {
             "Decision = NO" | Out-Host
             #Do nothing and leave $NewIPS alone...
@@ -129,7 +130,6 @@ Function Remove-IPs {
     }
     
     Write-Host "After removal of $NbItemsSelected IPs, we now have $($AllIPS.count) items"
-    Write-Host $AllIPS
 
     Write-Host "Will set connector:"
     $ConnectorSelected = $wpf.datagridReceiveConnectors.SelectedItem.Name
