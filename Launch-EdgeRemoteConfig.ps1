@@ -233,7 +233,7 @@ $inputXML = @"
         <Button x:Name="btnRemoveAllowIPAddresses" Content="Remove selected IP Address(es)" HorizontalAlignment="Left" Margin="0,228,0,0" VerticalAlignment="Top" Width="193" Height="36" Grid.Column="1"/>
         <CheckBox x:Name="chkExtendedIPView" Content="Extended IP Info View" Grid.Column="1" HorizontalAlignment="Left" Margin="189,41,0,0" VerticalAlignment="Top"/>
         <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="0,288,0,0" TextWrapping="Wrap" Text="Addresses to add (Comma separated - e.g. 125.3.10.15, 10.1.0.0/16, 212.12.0.0-212.12.255.255, 15.2.3.2):" VerticalAlignment="Top"/>
-        <Button x:Name="btnDumpIPs" Content="Dump Selected IPs to host" Grid.Column="1" HorizontalAlignment="Left" Margin="198,228,0,0" VerticalAlignment="Top" Width="152" Height="36"/>
+        <Button x:Name="btnApplyChanges" Content="Apply Changes" Grid.Column="1" HorizontalAlignment="Left" Margin="198,228,0,0" VerticalAlignment="Top" Width="152" Height="36" IsEnabled="False"/>
     </Grid>
 </Window>
 
