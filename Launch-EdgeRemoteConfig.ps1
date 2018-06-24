@@ -5,6 +5,16 @@ How-To GUI From Jim Moyle   :   https://github.com/JimMoyle/GUIDemo
 
 #>
 $global:GUIversion = "0.9"
+$global:IsModified = $false
+<#
+Global Variable ISMODIFIED controls the display of IP RANGES for connectors.
+If an address has been modified but not yet pushed to the connector, then display
+simple only - Simple is just IP addresses simple list because it's easier to
+push to the connector by using Set-ReceiveConnector -RemoteIPRange $IpAddressesFromDataGrid
+As we load again the receive connectors (Get-ReceiveConnectors button), ISMODIFIED is reset
+to $False, enabling extended view of IP Ranges (CIBR which is xxx.xxx.xxx.xxx/xx type, range 
+or Single, etc...)
+#>
 
 #========================================================
 #region Functions definitions (NOT the WPF form events)
@@ -181,6 +191,9 @@ function GetReceiveConnectors {
 }
 
 function GetReceiveConnectorRemoteIPRanges ([switch]$Simple) {
+    If ($global:IsModified -eq $True) {
+        $Simple = $True
+    }
     #$wpf.dataGridIPAllowed.ItemsSource = $($wpf.datagridReceiveConnectors.SelectedItem."Allowed IP Ranges" -split ",")
     [array]$IPRangesCollection = @()
     If ($Simple) {
@@ -275,6 +288,7 @@ $wpf.EdgeIPAllow.add_Closing({
 #region Buttons
 
 $wpf.btnRemoveAllowIPAddresses.add_click({
+    $Global:IsModified = $true
     Remove-IPs
 })
 
@@ -283,17 +297,19 @@ $wpf.btnDumpIPs.add_Click({
 })
 
 $wpf.btnAddIPAddresses.add_click({
+    $Global:IsModified = $true
     $ArrayOfIPToAdd = Split-ListColon $wpf.txtIPAddresses.Text -Noquotes
     $SelectedConnectorFullObject = $Global:ReceiveConnectors | ? {$_.Name -eq $wpf.datagridReceiveConnectors.SelectedItem.Name}
     $SelectedConnectorRemoteIPRanges = $SelectedConnectorFullObject.RemoteIPRanges
     $SelectedConnectorRemoteIPRanges += $ArrayOfIPToAdd
-    Set-ReceiveConnector $($wpf.datagridReceiveConnectors.SelectedItem.Name) -RemoteIPRanges $SelectedConnectorRemoteIPRanges
-    GetReceiveConnectors
+    #Set-ReceiveConnector $($wpf.datagridReceiveConnectors.SelectedItem.Name) -RemoteIPRanges $SelectedConnectorRemoteIPRanges
+    #GetReceiveConnectors
     $wpf.datagridReceiveConnectors.SelectedItem.Name = $SelectedConnectorFullObject.Name
     GetReceiveConnectorRemoteIPRanges
 })
 
 $wpf.btnGetReceiveConnectors.add_Click({
+    $global:IsModified = $false
     $msg = "Getting receive connectors..."
     Write-Host $msg
     GetReceiveConnectors
