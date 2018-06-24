@@ -310,6 +310,8 @@ $wpf.btnAddIPAddresses.add_click({
 
 $wpf.btnGetReceiveConnectors.add_Click({
     $global:IsModified = $false
+    $wpf.chkExtendedIPView.IsChecked = $false
+    $wpf.chkExtendedIPView.IsEnabled = $false
     $msg = "Getting receive connectors..."
     Write-Host $msg
     GetReceiveConnectors
