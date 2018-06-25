@@ -107,6 +107,7 @@ Function Remove-IPs {
     $SelectedIPs = $wpf.dataGridIPAllowed.SelectedItems
     Write-Host $SelectedIPs
     $NbItemsSelected = $($SelectedIPs.count)
+    Write-Host "Nb selected IPs: $NbItemsSelected"
     Write-Host $AllIPs
     Write-Host $($AllIPS.count)
     #[System.Windows.messagebox]::Show("Where are $($SelectedIPs.count) IP addresses","IP addresses")
@@ -126,9 +127,8 @@ Function Remove-IPs {
         If ($Decision -eq "Yes") {
             "Decision YES" | out-host
             #$ALLIPS = @{Expression="0.0.0.0-255.255.255.255"; RangeFormat=""; LowerBound=""; UpperBound=""; Netmask=""; CIDRLength=""; Size=""}
-            $Array  = @{"IP Address"="0.0.0.0-255.255.255.255"}
-            $ALLIPss = $Array
-            $wpf.dataGridIPAllowed.ItemsSource = $ALLIPss
+            $Array  = @{"Expression"="0.0.0.0-255.255.255.255"}
+            $wpf.dataGridIPAllowed.ItemsSource = $Array
         } Else {
             "Decision = NO" | Out-Host
             #Do nothing and leave $NewIPS alone...
@@ -148,6 +148,7 @@ Function Remove-IPs {
 
     $command = "Get-ReceiveConnector $ConnectorSelected | Set-ReceiveConnector -RemoteIPRanges $NewIPs"
     $command | out-host
+    #$wpf.chkExtendedIPView.IsChecked = $false
     Try{
         $CommandToInvoke = $Command + (" -ErrorAction Stop")
         #Invoke-Expression $commandToInvoke
@@ -289,29 +290,30 @@ $wpf.EdgeIPAllow.add_Closing({
 
 $wpf.btnRemoveAllowIPAddresses.add_click({
     $Global:IsModified = $true
+    #$wpf.chkExtendedIPView.IsChecked = $false
+    $wpf.chkExtendedIPView.IsEnabled = $false
     Remove-IPs
 })
 
-$wpf.btnDumpIPs.add_Click({
-    Dump-ToHost
-})
 
 $wpf.btnAddIPAddresses.add_click({
     $Global:IsModified = $true
+    $wpf.chkExtendedIPView.IsChecked = $false
+    $wpf.chkExtendedIPView.IsEnabled = $false
     $ArrayOfIPToAdd = Split-ListColon $wpf.txtIPAddresses.Text -Noquotes
     $SelectedConnectorFullObject = $Global:ReceiveConnectors | ? {$_.Name -eq $wpf.datagridReceiveConnectors.SelectedItem.Name}
-    $SelectedConnectorRemoteIPRanges = $SelectedConnectorFullObject.RemoteIPRanges
+    $SelectedConnectorRemoteIPRanges = $SelectedConnectorFullObject.RemoteIPRanges.Expression
     $SelectedConnectorRemoteIPRanges += $ArrayOfIPToAdd
     #Set-ReceiveConnector $($wpf.datagridReceiveConnectors.SelectedItem.Name) -RemoteIPRanges $SelectedConnectorRemoteIPRanges
     #GetReceiveConnectors
     $wpf.datagridReceiveConnectors.SelectedItem.Name = $SelectedConnectorFullObject.Name
-    GetReceiveConnectorRemoteIPRanges
+    #GetReceiveConnectorRemoteIPRanges
 })
 
 $wpf.btnGetReceiveConnectors.add_Click({
     $global:IsModified = $false
-    $wpf.chkExtendedIPView.IsChecked = $false
-    $wpf.chkExtendedIPView.IsEnabled = $false
+    $wpf.chkExtendedIPView.IsChecked = $True
+    $wpf.chkExtendedIPView.IsEnabled = $True
     $msg = "Getting receive connectors..."
     Write-Host $msg
     GetReceiveConnectors
@@ -345,10 +347,14 @@ $wpf.datagridReceiveConnectors.add_SelectionChanged({
 
 #region Checkboxes checked and unchecked
 $wpf.chkExtendedIPView.add_Checked({
-    GetReceiveConnectorRemoteIPRanges
+    #GetReceiveConnectorRemoteIPRanges
+    [array]$CurrentLocalGrid = $wpf.dataGridIPAllowed.ItemsSource
+    $wpf.dataGridIPAllowed.ItemsSource = $CurrentLocalGrid | Select Expression,RangeFormat, LowerBound, UpperBound, NetMask, CIDRLength, Size
 })
 $wpf.chkExtendedIPView.add_UnChecked({
-    GetReceiveConnectorRemoteIPRanges -Simple
+    #GetReceiveConnectorRemoteIPRanges -Simple
+    [array]$CurrentLocalGrid = $wpf.dataGridIPAllowed.ItemsSource
+    $wpf.dataGridIPAllowed.ItemsSource = $CurrentLocalGrid | Select Expression
 })
 
 # End of Checkboxes checked and unchecked
