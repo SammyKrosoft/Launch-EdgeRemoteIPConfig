@@ -348,13 +348,25 @@ $wpf.datagridReceiveConnectors.add_SelectionChanged({
 #region Checkboxes checked and unchecked
 $wpf.chkExtendedIPView.add_Checked({
     #GetReceiveConnectorRemoteIPRanges
-    [array]$CurrentLocalGrid = $wpf.dataGridIPAllowed.ItemsSource
-    $wpf.dataGridIPAllowed.ItemsSource = $CurrentLocalGrid | Select Expression,RangeFormat, LowerBound, UpperBound, NetMask, CIDRLength, Size
+    # [array]$CurrentLocalGrid = $wpf.dataGridIPAllowed.ItemsSource
+    # $wpf.dataGridIPAllowed.ItemsSource = $CurrentLocalGrid | Select Expression,RangeFormat, LowerBound, UpperBound, NetMask, CIDRLength, Size
+    $wpf.dataGridIPAllowed.Columns[2].visibility = $true
+    $wpf.dataGridIPAllowed.Columns[3].visibility = $true
+    $wpf.dataGridIPAllowed.Columns[4].visibility = $true
+    $wpf.dataGridIPAllowed.Columns[5].visibility = $true
+    $wpf.dataGridIPAllowed.Columns[6].visibility = $true
+    $wpf.dataGridIPAllowed.Columns[7].visibility = $true
 })
 $wpf.chkExtendedIPView.add_UnChecked({
     #GetReceiveConnectorRemoteIPRanges -Simple
-    [array]$CurrentLocalGrid = $wpf.dataGridIPAllowed.ItemsSource
-    $wpf.dataGridIPAllowed.ItemsSource = $CurrentLocalGrid | Select Expression
+    # [array]$CurrentLocalGrid = $wpf.dataGridIPAllowed.ItemsSource
+    # $wpf.dataGridIPAllowed.ItemsSource = $CurrentLocalGrid | Select Expression
+    $wpf.dataGridIPAllowed.Columns[2].visibility = $false
+    $wpf.dataGridIPAllowed.Columns[3].visibility = $false
+    $wpf.dataGridIPAllowed.Columns[4].visibility = $false
+    $wpf.dataGridIPAllowed.Columns[5].visibility = $false
+    $wpf.dataGridIPAllowed.Columns[6].visibility = $false
+    $wpf.dataGridIPAllowed.Columns[7].visibility = $false
 })
 
 # End of Checkboxes checked and unchecked
