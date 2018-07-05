@@ -20,9 +20,14 @@ or Single, etc...)
 #region Functions definitions (NOT the WPF form events)
 #========================================================
 
-Function MessageBox ($Title = "Validation",$msg="Message not provided...",$Button = "YesNo",$Icon = "Question") {
+Function MessageBox ($Title = "Validation",$msg="Usage: MessageBox -Title ""Title"" -msg ""Your message"" -Button ""Ok/OkCancel/YesNo"" -Icon ""Question/Information/Error/Warning""",$Button = "YesNo",$Icon = "Question") {
     return [System.Windows.MessageBox]::Show($msg,$Title, $Button, $icon)
 }
+
+# To test MessageBox, uncomment the 2 lines below, highlight the above MEssageBox function plus the below
+# two lines, and press "F8" key to execute selection only...
+# Add-Type -AssemblyName presentationframework, presentationcore
+# MessageBox -Icon "Warning"
 
 Function IsPSV3 {
     <#
